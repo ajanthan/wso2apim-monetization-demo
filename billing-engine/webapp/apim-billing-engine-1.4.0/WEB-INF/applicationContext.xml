@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <import resource="datasource-config.xml"/>
+    <import resource="webflow-config.xml"/>
+    <import resource="security-config.xml"/>
+
+    <!--<bean name="usagePlan" class="org.wso2.apim.billing.domain.BillingPlan" scope="session"/>-->
+    <!--<bean name="billingModel" class="org.wso2.apim.billing.domain.BillingModel" scope="request"/>-->
+
+    <!-- DAO declarations -->
+    <bean id="userDao" class="org.wso2.apim.billing.dao.UserJpaDao"/>
+    <bean id="planDao" class="org.wso2.apim.billing.dao.PlanJpaDao"/>
+    <bean id="usagePlanDao" class="org.wso2.apim.billing.dao.UsagePlanJpaDao"/>
+    <bean id="invoiceDao" class="org.wso2.apim.billing.dao.InvoiceJpaDao"/>
+    <bean id="subscriptionDao" class="org.wso2.apim.billing.dao.SubscriptionJPADao"/>
+    <bean id="workflowDao" class="org.wso2.apim.billing.dao.WorkflowJpaDao"/>
+    <bean id="spRestClient" class="org.wso2.apim.billing.clients.SPRestClient">
+        <constructor-arg type="java.lang.String" value="${dasUrl}"/>
+        <constructor-arg type="java.lang.String" value="${dasUserName}"/>
+        <constructor-arg type="char[]" value="${dasPassword}"/>
+        <constructor-arg type="java.lang.String" value="${spTrustStore}"/>
+        <constructor-arg type="char[]" value="${spTrustStorePassword}"/>
+    </bean>
+    <bean id="meteredPlanProcessor" class="org.wso2.apim.billing.services.impl.MeteredPlanProcessor">
+        <constructor-arg>
+            <ref bean="spRestClient"/>
+        </constructor-arg>
+    </bean>
+    <bean id="quotaPlanProcessor" class="org.wso2.apim.billing.services.impl.QuotaPlanProcessor">
+        <constructor-arg>
+            <ref bean="spRestClient"/>
+        </constructor-arg>
+    </bean>
+
+    <bean id="invoiceGenerator" class="org.wso2.apim.billing.services.impl.InvoiceGenerator">
+        <property name="usagePlanDao" ref="usagePlanDao"/>
+        <property name="meteredPlanProcessor" ref="meteredPlanProcessor"/>
+        <property name="quotaPlanProcessor" ref="quotaPlanProcessor"/>
+    </bean>
+
+    <bean id="planConverter" class="org.wso2.apim.billing.bean.PlanConverter">
+        <property name="planDAO" ref="planDao"/>
+    </bean>
+
+    <bean id="tokenManager" class="org.wso2.apim.billing.clients.TokenManager">
+        <property name="userName" value="${apimUserName}"/>
+        <property name="password" value="${apimPassword}"/>
+        <property name="tokenUrl" value="${tokenUrl}"/>
+        <property name="dcrUrl" value="${dcrUrl}"/>
+        <property name="introspectUrl" value="${introspectUrl}"/>
+        <property name="apimTrustStore" value="${apimTrustStore}"/>
+        <property name="apimTrustStorePassword" value="${apimTrustStorePassword}"/>
+        <constructor-arg type="java.lang.String" value="${apimTrustStore}"/>
+        <constructor-arg type="java.lang.String" value="${apimTrustStorePassword}"/>
+    </bean>
+    <bean id="apirestClient" class="org.wso2.apim.billing.clients.APIRESTClient">
+        <constructor-arg type="java.lang.String" value="${publisherUrl}"/>
+        <constructor-arg type="java.lang.String" value="${apimTrustStore}"/>
+        <constructor-arg type="java.lang.String" value="${apimTrustStorePassword}"/>
+    </bean>
+    <bean id="apiInfoService" class="org.wso2.apim.billing.services.impl.APIInfoServiceImpl">
+        <property name="publisherUrl" value="${publisherUrl}"/>
+        <property name="tokenManager" ref="tokenManager"/>
+        <property name="apirestClient" ref="apirestClient"/>
+    </bean>
+
+
+    <!-- Services declarations -->
+    <bean id="userService" class="org.wso2.apim.billing.services.impl.UserServiceImpl">
+        <property name="userDao" ref="userDao"/>
+        <property name="userRole" value="${userRole}"/>
+    </bean>
+    <bean id="planService" class="org.wso2.apim.billing.services.impl.PlanServiceImpl">
+        <property name="planDao" ref="planDao"/>
+        <property name="usagePlanDao" ref="usagePlanDao"/>
+        <property name="subscriptionDao" ref="subscriptionDao"/>
+        <property name="workflowDao" ref="workflowDao"/>
+        <property name="workflowClient" ref="workflowClient"/>
+    </bean>
+    <bean id="invoiceService" class="org.wso2.apim.billing.services.impl.InvoiceServiceImpl">
+        <property name="invoiceGenerator" ref="invoiceGenerator"/>
+        <property name="invoiceDao" ref="invoiceDao"/>
+        <property name="subscriptionDao" ref="subscriptionDao"/>
+        <property name="userDao" ref="userDao"/>
+    </bean>
+    <bean id="subscriptionService" class="org.wso2.apim.billing.services.impl.SubscriptionServiceImpl">
+        <property name="subscriptionDao" ref="subscriptionDao"/>
+    </bean>
+
+    <bean id="userAuthenticationProviderService"
+          class="org.wso2.apim.billing.services.impl.UserAuthenticationProviderServiceImpl">
+        <property name="authenticationManager" ref="authenticationManager"/>
+    </bean>
+
+    <bean id="workflowClient" class="org.wso2.apim.billing.services.impl.WorkflowClientImpl">
+        <property name="apimTrustStore" value="${apimTrustStore}"/>
+        <property name="apimTrustStorePassword" value="${apimTrustStorePassword}"/>
+        <property name="apimUserName" value="${apimUserName}"/>
+        <property name="apimPassword" value="${apimPassword}"/>
+    </bean>
+
+    <bean id="checkAdminUser" class="org.wso2.apim.billing.dao.StartupUserCheck" init-method="checkOrUpdate">
+        <property name="userDao" ref="userDao"/>
+        <property name="adminUser" value="${adminUser}"/>
+        <property name="adminPass" value="${adminPass}"/>
+        <property name="adminRole" value="${adminRole}"/>
+    </bean>
+</beans>

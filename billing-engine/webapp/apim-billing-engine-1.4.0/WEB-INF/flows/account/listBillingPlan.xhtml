@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:c="http://java.sun.com/jsp/jstl/core"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/templates/general.xhtml">
+
+    <style type="text/css">
+        .value {
+            font-weight: bold;
+        }
+
+        .ui-carousel {
+            margin-bottom: 20px;
+        }
+    </style>
+
+    <ui:define name="title">
+        <h:outputText value="Define New Billing Plan"/>
+    </ui:define>
+    <ui:define name="header">
+        <h:outputText value="Define New Billing Plan"/>
+    </ui:define>
+
+    <ui:define name="content">
+
+        <h1>Define new Billing plan</h1>
+
+        <h:form id="newPlanForm">
+            <p:fieldset styleClass="fieldset" legend="Define Billing Plan">
+                <p:focus/>
+                <p:messages id="messages" globalOnly="true"/>
+
+                <h:panelGrid id="regPanelGrid" style="margin: 0 auto; margin-top: 25px;"
+                             cellspacing="8" columns="2">
+
+                    <p:outputLabel for="apiName" value="Select API:"/>
+                    <p:selectOneMenu id="apiName" style="width:200px" defaultLabel="Select a API.."
+                                     value="#{usagePlan.apiName}">
+                        <f:selectItem itemLabel="Select API" itemValue=""/>
+                        <f:selectItems value="#{apiInfoService.listApis()}"/>
+                        <f:ajax render="apiVersion"/>
+                    </p:selectOneMenu>
+
+                    <p:outputLabel for="apiVersion" value="Select Version:"/>
+                    <p:selectOneMenu id="apiVersion" style="width:200px" defaultLabel="Select a Version.."
+                                     value="#{usagePlan.apiID}">
+                        <f:selectItem itemLabel="Select Version" itemValue=""/>
+                        <f:selectItems value="#{apiInfoService.listVersions(usagePlan.apiName)}" var="info"
+                                       itemLabel="#{info.version}"
+                                       itemValue="#{info.id}"/>
+                        <f:ajax render="policy"/>
+                    </p:selectOneMenu>
+
+                    <p:outputLabel for="policy" value="Select Policy:"/>
+                    <p:selectOneMenu id="policy" style="width:200px" defaultLabel="Select a policy.."
+                                     value="#{usagePlan.throttlePolicy}">
+                        <f:selectItem itemLabel="Select Policy" itemValue=""/>
+                        <f:selectItems value="#{apiInfoService.listPolicies(usagePlan)}"
+                                       var="info"
+                                       itemLabel="#{info}"
+                                       itemValue="#{info}"/>
+                        <f:ajax render="plansPanel"/>
+                    </p:selectOneMenu>
+
+                </h:panelGrid>
+
+                <h:panelGrid id="plansPanel" columns="4">
+                    <p:growl id="growl" showDetail="true" sticky="true" life="13000"/>
+                    <c:forEach items="${planService.listBillingPlan(request.remoteUser, usagePlan)}" var="billingModel"
+                               varStatus="status">
+                        <p:panelGrid columns="2" style="width:100%;margin:10px 0px" columnClasses="label,value"
+                                     layout="grid" styleClass="ui-panelgrid-blank">
+                            <f:facet name="header">
+                                <h:outputText value="${billingModel.packageName}"/>
+                            </f:facet>
+
+                            <h:outputText value="Type"/>
+                            <h:outputText value="${billingModel.packageType}"/>
+                            <c:forEach items="${billingModel.getAttributes()}" var="attribute">
+                                <h:outputText value="#{attribute.displayName}:"/>
+                                <h:outputText value="#{attribute.value}"/>
+                            </c:forEach>
+                            <f:facet name="footer">
+                                <c:if test="#{billingModel.subscription eq false}">
+                                    <p:commandButton id="Subscribe_${status.index}_s" immediate="true"
+                                                     action="#{planService.subscribe(request.remoteUser, billingModel.id, usagePlan)}"
+                                                     value="Subscribe" update="plansPanel">
+                                        <f:ajax render="plansPanel"/>
+                                    </p:commandButton>
+                                </c:if>
+                                <c:if test="#{billingModel.subscription eq true}">
+                                    <p:commandButton id="Subscribe_${status.index}_f" immediate="true"
+                                                     action="#{planService.unSubscribe(request.remoteUser, billingModel.id)}"
+                                                     value="Unsubscribe" update="plansPanel">
+                                        <f:ajax render="plansPanel"/>
+                                    </p:commandButton>
+                                </c:if>
+                            </f:facet>
+                        </p:panelGrid>
+                    </c:forEach>
+                </h:panelGrid>
+
+                <p:commandButton id="backToHome" action="backToHome" immediate="true"
+                                 icon="ui-icon-arrowreturnthick-1-w" value="Back to Home"/>
+
+            </p:fieldset>
+        </h:form>
+
+    </ui:define>
+
+</ui:composition>
