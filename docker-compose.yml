@@ -67,5 +67,10 @@ services:
         condition: service_healthy
       api-manager:
         condition: service_healthy
+    environment:
+      - VerifyHostname=false
+    volumes:
+      - ./billing-engine/client-truststore.jks:/usr/local/tomcat/client-truststore.jks
+      - ./billing-engine/datasource.properties:/usr/local/tomcat/webapps/apim-billing-engine-1.4.0/WEB-INF/classes/datasource.properties
     ports:
       - "8080:8080"
