@@ -645,6 +645,10 @@
              nodejs, perl, php, python, ruby, swift, clojure, asyncScala, csharpDotNet2-->
             <SupportedLanguages>java,android</SupportedLanguages>
         </ClientGeneration>
-    </SwaggerCodegen>
+</SwaggerCodegen>
+<BillingEngine>
+        <BillingEngineUrl>http://billing-engine:8080/apim-billing-engine-1.4.0/</BillingEngineUrl>
+        <ApimStoreUrl>https://localhost:9443/store/</ApimStoreUrl>
+</BillingEngine>    
 
 </APIManager>
