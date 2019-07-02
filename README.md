@@ -11,6 +11,7 @@ Boot up the docker compose setup by issuing following command and wait until eve
 
 ### Step 02: Adding DNS for Billing Engine
 Add following to /etc/hosts.
+
 `127.0.0.1       billing-engine`
 
 ### Step 03: Deploying A Sample API
