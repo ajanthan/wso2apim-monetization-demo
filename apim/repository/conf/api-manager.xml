@@ -647,8 +647,8 @@
         </ClientGeneration>
 </SwaggerCodegen>
 <BillingEngine>
-        <BillingEngineUrl>http://billing-engine:8080/apim-billing-engine-1.4.0/</BillingEngineUrl>
-        <ApimStoreUrl>https://localhost:9443/store/</ApimStoreUrl>
+        <BillingEngineUrl>http://billing-engine:8080/apim-billing-engine-1.4.0</BillingEngineUrl>
+        <ApimStoreUrl>https://api-manager:9443/store</ApimStoreUrl>
 </BillingEngine>    
 
 </APIManager>
