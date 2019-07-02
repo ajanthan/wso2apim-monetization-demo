@@ -5,7 +5,7 @@ A Docker Compose based WSO2 API Manager Monetization Demo
 The purpose of the demo to demonstrate WSO2 API Manager Monetization capability by generating an invoice for a sample API.
 
 ### Step 01: Starting the servers
-Boot up the docker compose setup by issuing following command and wait until every server is up and running(you can watch the logs through docker-compose logs -f` and ensure the successful server start up).
+Boot up the docker compose setup by issuing following command and wait until every server is up and running(you can watch the logs through `docker-compose logs -f` and ensure the successful server start up).
 
 `docker-compose up -d`
 
