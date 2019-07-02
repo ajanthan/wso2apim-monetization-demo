@@ -15,7 +15,7 @@ Add following to /etc/hosts.
 `127.0.0.1       billing-engine`
 
 ### Step 03: Deploying A Sample API
-Access the publisher at [https://localhost:9443/publisher](https://localhost:9443/publisher) and login using default credential(admin:admin). Then deploy the sample.
+Access the publisher at [https://localhost:9443/publisher](https://localhost:9443/publisher) and login using default credential(admin:admin). Then deploy the sample API.
 
 ### Step 04: Defining Billing Plan
 Login into [Billing engine](http://billing-engine:8080/apim-billing-engine-1.4.0/) using the defualt credentials(admin:admin) and define a plan for the sample API. After creating the billing plan, makesure to logout of the application.
